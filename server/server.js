@@ -1,15 +1,17 @@
 import express from 'express'
 import path from 'path'
 import axios from 'axios'
+// import fs from 'fs.promises'
 import cors from 'cors'
 import bodyParser from 'body-parser'
 import sockjs from 'sockjs'
 import { renderToStaticNodeStream } from 'react-dom/server'
 import React from 'react'
-
 import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
+
+const { readFile, writeFile} = require("fs").promises;
 
 const Root = () => ''
 
@@ -41,6 +43,29 @@ const middleware = [
 ]
 
 middleware.forEach((it) => server.use(it))
+
+function toWriteFile (dataFile){
+  writeFile(`${__dirname}/users.json`, (JSON.stringify(dataFile)), { encoding: "utf8" }) 
+}
+function fileContent(){
+  const bigData = readFile(`${__dirname}/users.json`, { encoding: "utf8" })
+  .then(users => {  
+    /* вернется текст из файла, а не объект джаваскрипта */
+    return JSON.parse(users)  
+  })  
+  .catch(async () => {  
+    /* случается когда нет файла */
+    const result = await axios('https://jsonplaceholder.typicode.com/users')
+    toWriteFile(result.data)
+    return result.data
+  })
+  return bigData
+}
+
+server.get('/api/v2/users', async (req, res) => {
+  const newData = await fileContent()
+  res.send(newData)
+})
 
 server.get('/api/v1/users', async (req, res) => {
   const { data: users } = await axios('https://jsonplaceholder.typicode.com/users')
