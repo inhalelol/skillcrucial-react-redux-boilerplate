@@ -97,8 +97,8 @@ server.patch('/api/v1/users/:userId', async (req, res) => {
 server.delete('/api/v1/users/:userId', async (req, res) => {
   const { userId } = req.params
   const arr = await fileContent()
-  const objId = arr.filter((obj) => obj.id === +userId)
-  const arr2 = arr.map((rec) => rec.id !== objId.id)
+  const objId = arr.find((obj) => obj.id === +userId)
+  const arr2 = arr.filter((rec) => rec.id !== objId.id)
   toWriteFile(arr2)
   res.json({ status: 'succes', id: userId })
 })
