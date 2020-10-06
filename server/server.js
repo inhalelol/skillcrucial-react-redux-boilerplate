@@ -1,4 +1,4 @@
-import express, { response } from 'express'
+import express from 'express'
 import path from 'path'
 import axios from 'axios'
 import cors from 'cors'
@@ -10,9 +10,9 @@ import cookieParser from 'cookie-parser'
 import config from './config'
 import Html from '../client/html'
 
-const { readFile, writeFile, unlink } = require("fs").promises;
-
 const Root = () => ''
+
+const { readFile, writeFile, unlink } = require('fs').promises
 
 try {
   // eslint-disable-next-line import/no-unresolved
@@ -51,8 +51,9 @@ const middleware = [
 middleware.forEach((it) => server.use(it))
 
 function toWriteFile(dataFile){
-  writeFile(`${__dirname}/users.json`, (JSON.stringify(dataFile)), { encoding: "utf8" }) 
+  writeFile(`${__dirname}/users.json`, JSON.stringify(dataFile), 'utf8') 
 }
+
 function fileContent(){
   const bigData = readFile(`${__dirname}/users.json`)
   .then((file) => {  
@@ -63,9 +64,9 @@ function fileContent(){
     /* случается когда нет файла */
     const result = await axios('https://jsonplaceholder.typicode.com/users')
       .then(res => res.data)
-    response.sort((a, b) => a.id - b.id)
-    toWriteFile(result.data)
-    return result.data
+    result.sort((a, b) => a.id - b.id)
+    toWriteFile(result)
+    return result
   })
   return bigData
 }
